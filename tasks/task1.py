@@ -1,4 +1,18 @@
 import random
+import logging
+
+
+# настройка логгера
+logger = logging.getLogger("task1")
+logger.setLevel(logging.INFO)
+
+handler = logging.FileHandler("task1.log", encoding="utf-8")
+handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s"))
+
+if not logger.handlers:
+    logger.addHandler(handler)
+    logger.propagate = False
+
 
 def sort_desc(arr):
     """
@@ -10,6 +24,7 @@ def sort_desc(arr):
     Returns:
         list[int]: новый список, отсортированный по убыванию.
     """
+    logger.info(f"Вызов sort_desc с массивом: {arr}")
     return sorted(arr, reverse=True)
 
 
@@ -23,6 +38,7 @@ def sort_asc(arr):
     Returns:
         list[int]: новый список, отсортированный по возрастанию.
     """
+    logger.info(f"Вызов sort_asc с массивом: {arr}")
     return sorted(arr)
 
 
@@ -39,6 +55,7 @@ def sum_arrays_with_zero(a, b):
     Returns:
         list[int]: результирующий массив после обработки
     """
+    logger.info("Вызов sum_arrays_with_zero")
     return [0 if x == y else x + y for x, y in zip(a, b)]
 
 
@@ -63,9 +80,11 @@ def solve(arr1, arr2):
     """
     if len(arr1) != len(arr2):
         raise ValueError("Массивы должны быть одинаковой длины")
+    logger.info("Вызов solve: начало обработки")
     a_sorted = sort_desc(arr1)
     b_sorted = sort_asc(arr2)
     summed = sum_arrays_with_zero(a_sorted, b_sorted)
+    logger.info(f"Алгоритм завершён. Результат: {sort_asc(summed)}")
     return sort_asc(summed)
 
 
@@ -97,6 +116,7 @@ def menu():
         print("4. Вывести результат")
         print("5. Назад в главное меню")
         choice = input("Выберите действие: ").strip()
+        logger.info(f"Пользователь выбрал пункт меню: {choice}")
 
         if choice == "1":
             try:
@@ -108,8 +128,10 @@ def menu():
                 else:
                     result = None  # сброс результата
                     print("Данные успешно введены.")
+                    logger.info("Данные введены вручную")
             except ValueError:
                 print("Ошибка: введите только целые числа!")
+                logger.info("Отказ: попытка выполнить алгоритм без данных")
                 arr1 = arr2 = None
 
         elif choice == "2":
@@ -124,27 +146,35 @@ def menu():
                 print("Сгенерировано:")
                 print("Массив 1:", arr1)
                 print("Массив 2:", arr2)
+                logger.info(f"Сгенерированы случайные массивы длины {n}")
             except ValueError:
                 print("Ошибка: введите корректное целое число!")
+                logger.info("Отказ: попытка выполнить алгоритм без данных")
 
         elif choice == "3":
             if arr1 is None or arr2 is None:
                 print("Ошибка: сначала введите данные!")
+                logger.info("Отказ: попытка выполнить алгоритм без данных")
             else:
                 try:
                     result = solve(arr1, arr2)
                     print("Алгоритм выполнен.")
+                    logger.info("Алгоритм успешно выполнен")
                 except Exception as e:
                     print(f"Ошибка при выполнении: {e}")
+                    logger.info(f"Ошибка при выполнении: {e}")
                     result = None
 
         elif choice == "4":
             if result is None:
                 print("Ошибка: сначала выполните алгоритм!")
+                logger.info("Отказ: попытка вывода результата без выполнения")
             else:
                 print("Результат:", result)
+                logger.info("Результат выведен")
 
         elif choice == "5":
+            logger.info("Пользователь вышел из меню задания 1")
             break
         else:
             print("Неверный выбор.")

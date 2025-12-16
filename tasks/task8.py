@@ -1,7 +1,21 @@
 import random
+import logging
 
+# настройка логирования
+logger = logging.getLogger("task8")
+logger.setLevel(logging.INFO)  # уровень INFO — можно сменить на CRITICAL для отключения
+
+# обработчик: запись в файл
+handler = logging.FileHandler("task8.log", encoding="utf-8")
+handler.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s - %(message)s"))
+
+# избегаем дублирования, если модуль импортируется повторно
+if not logger.handlers:
+    logger.addHandler(handler)
+    logger.propagate = False
 
 def reverse_number(n):
+    logger.info(f"Вызов reverse_number с аргументом: {n}")
     """
     возвращает целое число, полученное переворотом цифр исходного числа.
     пример: 123 -> 321, 100 -> 1 (лидирующие нули отбрасываются)
@@ -34,9 +48,11 @@ def count_common_with_reverse(arr1, arr2):
         int: количество "общих" чисел с учётом перевёрнутых версий
     """
     count = 0
+    logger.info("Вызов count_common_with_reverse")
     for x in arr1:
         if x in arr2 or reverse_number(x) in arr2:
             count += 1
+    logger.info(f"Результат подсчёта: {count}")
     return count
 
 
@@ -67,13 +83,16 @@ def menu():
         print("4. Вывести результат")
         print("5. Назад в главное меню")
         choice = input("Выберите действие: ").strip()
+        logger.info(f"Пользователь выбрал пункт меню: {choice}")
 
         if choice == "1":
             try:
                 arr1 = list(map(int, input("Массив 1 (через пробел): ").split()))
                 arr2 = list(map(int, input("Массив 2 (через пробел): ").split()))
                 result = None  # сброс результата
+                logger.info("Данные введены вручную")
             except ValueError:
+                logger.info("Отказ: попытка выполнить алгоритм без введённых данных")
                 print("Ошибка: введите только целые числа!")
                 arr1 = arr2 = None
 
@@ -89,23 +108,29 @@ def menu():
                 print("Сгенерировано:")
                 print("Массив 1:", arr1)
                 print("Массив 2:", arr2)
+                logger.info(f"Сгенерированы случайные массивы длины {n}")
             except ValueError:
                 print("Ошибка: введите целое число!")
+                logger.info("Отказ: попытка выполнить алгоритм без введённых данных")
 
         elif choice == "3":
             if arr1 is None or arr2 is None:
                 print("Ошибка: сначала введите данные!")
+                logger.info("Отказ: попытка выполнить алгоритм без введённых данных")
             else:
                 result = count_common_with_reverse(arr1, arr2)
                 print("Алгоритм выполнен.")
+                logger.info("Алгоритм успешно выполнен")
 
         elif choice == "4":
             if result is None:
                 print("Ошибка: выполните алгоритм перед выводом!")
+                logger.info("Отказ: попытка вывода результата без выполнения")
             else:
                 print(f"Общих чисел (с перевёрнутыми): {result}")
 
         elif choice == "5":
+            logger.info("Пользователь вышел из меню задания 8")
             break
         else:
             print("Неверный выбор.")
