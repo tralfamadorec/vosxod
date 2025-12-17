@@ -13,6 +13,8 @@ if not logger.handlers:
     logger.propagate = False
 
 def count_subarrays_with_sum(arr, target):
+    if not arr:
+        raise ValueError("Массив не должен быть пустым")
     """
     подсчитывает количество непрерывных подмассивов, сумма элементов которых равна заданному числу.
     подмассив - это последовательный фрагмент исходного массива.
@@ -77,9 +79,9 @@ def menu():
                 result = None  # сброс результата
                 print("Данные успешно введены.")
                 logger.info("Данные введены вручную")
-            except ValueError:
+            except ValueError as e:
                 print("Ошибка: введите только целые числа!")
-                logger.info("Отказ: попытка выполнить алгоритм без данных")
+                logger.error(f"Ошибка ввода вручную в задании 5: {e}")
                 arr = target = None
 
         elif choice == "2":
@@ -95,18 +97,28 @@ def menu():
                 print("Массив:", arr)
                 print("Целевое число:", target)
                 logger.info(f"Сгенерированы случайные данные: массив длины {n}, цель = {target}")
-            except ValueError:
+            except ValueError as e:
                 print("Ошибка: введите корректное целое число!")
-                logger.info("Отказ: попытка выполнить алгоритм без данных")
+                logger.error(f"Ошибка генерации данных в задании 5: {e}")
+
 
         elif choice == "3":
             if arr is None or target is None:
                 print("Ошибка: сначала введите данные!")
                 logger.info("Отказ: попытка выполнить алгоритм без данных")
             else:
-                result = count_subarrays_with_sum(arr, target)
-                print("Алгоритм выполнен.")
-                logger.info("Алгоритм успешно выполнен")
+                try:
+                    result = count_subarrays_with_sum(arr, target)
+                    print("Алгоритм выполнен.")
+                    logger.info("Алгоритм успешно выполнен")
+                except ValueError as e:
+                    print(f"Ошибка в данных: {e}")
+                    logger.error(f"ValueError в count_subarrays_with_sum: {e}")
+                    result = None
+                except Exception as e:
+                    print(f"Неожиданная ошибка: {e}")
+                    logger.error(f"Неожиданное исключение в задании 5: {e}")
+                    result = None
 
         elif choice == "4":
             if result is None:

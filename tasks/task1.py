@@ -129,9 +129,9 @@ def menu():
                     result = None  # сброс результата
                     print("Данные успешно введены.")
                     logger.info("Данные введены вручную")
-            except ValueError:
+            except ValueError as e:
                 print("Ошибка: введите только целые числа!")
-                logger.info("Отказ: попытка выполнить алгоритм без данных")
+                logger.error(f"Ошибка ввода вручную: {e}")
                 arr1 = arr2 = None
 
         elif choice == "2":
@@ -147,9 +147,9 @@ def menu():
                 print("Массив 1:", arr1)
                 print("Массив 2:", arr2)
                 logger.info(f"Сгенерированы случайные массивы длины {n}")
-            except ValueError:
-                print("Ошибка: введите корректное целое число!")
-                logger.info("Отказ: попытка выполнить алгоритм без данных")
+            except ValueError as e:
+                print("Ошибка: введите целое число!")
+                logger.error(f"Ошибка генерации: {e}")
 
         elif choice == "3":
             if arr1 is None or arr2 is None:
@@ -160,9 +160,13 @@ def menu():
                     result = solve(arr1, arr2)
                     print("Алгоритм выполнен.")
                     logger.info("Алгоритм успешно выполнен")
+                except ValueError as e:
+                    print(f"Ошибка в данных: {e}")
+                    logger.error(f"ValueError в solve: {e}")
+                    result = None
                 except Exception as e:
-                    print(f"Ошибка при выполнении: {e}")
-                    logger.info(f"Ошибка при выполнении: {e}")
+                    print(f"Неожиданная ошибка: {e}")
+                    logger.error(f"Неожиданное исключение в solve: {e}")
                     result = None
 
         elif choice == "4":

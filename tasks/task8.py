@@ -29,10 +29,13 @@ def reverse_number(n):
     Raises:
         ValueError: если входное значение не является целым числом
     """
+    if n < 0:
+        raise ValueError("Число должно быть неотрицательным для корректного переворота")
     return int(str(n)[::-1])
 
-
 def count_common_with_reverse(arr1, arr2):
+    if not arr1 or not arr2:
+        raise ValueError("Массивы не должны быть пустыми")
     """
     считает количество элементов из первого массива, которые:
     - присутствуют во втором массиве, ИЛИ
@@ -91,9 +94,9 @@ def menu():
                 arr2 = list(map(int, input("Массив 2 (через пробел): ").split()))
                 result = None  # сброс результата
                 logger.info("Данные введены вручную")
-            except ValueError:
-                logger.info("Отказ: попытка выполнить алгоритм без введённых данных")
+            except ValueError as e:
                 print("Ошибка: введите только целые числа!")
+                logger.error(f"Ошибка ввода вручную в задании 8: {e}")
                 arr1 = arr2 = None
 
         elif choice == "2":
@@ -109,18 +112,27 @@ def menu():
                 print("Массив 1:", arr1)
                 print("Массив 2:", arr2)
                 logger.info(f"Сгенерированы случайные массивы длины {n}")
-            except ValueError:
+            except ValueError as e:
                 print("Ошибка: введите целое число!")
-                logger.info("Отказ: попытка выполнить алгоритм без введённых данных")
+                logger.error(f"Ошибка генерации данных в задании 8: {e}")
 
         elif choice == "3":
             if arr1 is None or arr2 is None:
                 print("Ошибка: сначала введите данные!")
-                logger.info("Отказ: попытка выполнить алгоритм без введённых данных")
+                logger.info("Отказ: попытка выполнить алгоритм без данных")
             else:
-                result = count_common_with_reverse(arr1, arr2)
-                print("Алгоритм выполнен.")
-                logger.info("Алгоритм успешно выполнен")
+                try:
+                    result = count_common_with_reverse(arr1, arr2)
+                    print("Алгоритм выполнен.")
+                    logger.info("Алгоритм успешно выполнен")
+                except ValueError as e:
+                    print(f"Ошибка в данных: {e}")
+                    logger.error(f"ValueError в count_common_with_reverse: {e}")
+                    result = None
+                except Exception as e:
+                    print(f"Неожиданная ошибка: {e}")
+                    logger.error(f"Неожиданное исключение в задании 8: {e}")
+                    result = None
 
         elif choice == "4":
             if result is None:

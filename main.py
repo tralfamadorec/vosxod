@@ -73,4 +73,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nПрограмма прервана пользователем.")
+        logger.info("Программа прервана пользователем (Ctrl+C)")
+    except Exception as e:
+        print(f"Критическая ошибка: {e}")
+        logger.critical(f"Критическая ошибка в главном потоке: {e}")
