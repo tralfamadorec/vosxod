@@ -1,5 +1,6 @@
 import random
 import logging
+from errors import ArraysLengthMismatchError, InvalidInputError, Messages
 
 
 # настройка логгера
@@ -79,7 +80,7 @@ def solve(arr1, arr2):
         ValueError: если длины массивов не совпадают
     """
     if len(arr1) != len(arr2):
-        raise ValueError("Массивы должны быть одинаковой длины")
+        raise ArraysLengthMismatchError(Messages.TASK1_ARRAYS_LEN_MISMATCH)
     logger.info("Вызов solve: начало обработки")
     a_sorted = sort_desc(arr1)
     b_sorted = sort_asc(arr2)
@@ -120,49 +121,67 @@ def menu():
 
         if choice == "1":
             try:
-                arr1 = list(map(int, input("Массив 1 (через пробел): ").split()))
-                arr2 = list(map(int, input("Массив 2 (через пробел): ").split()))
+                raw1 = input("Массив 1 (через пробел): ").strip()
+                raw2 = input("Массив 2 (через пробел): ").strip()
+                if not raw1 or not raw2:
+                    raise InvalidInputError("Один из массивов не введён")
+                arr1 = []
+                for x in raw1.split():
+                    try:
+                        arr1.append(int(x))
+                    except ValueError:
+                        raise InvalidInputError(Messages.INVALID_INPUT_INT)
+                arr2 = []
+                for x in raw2.split():
+                    try:
+                        arr2.append(int(x))
+                    except ValueError:
+                        raise InvalidInputError(Messages.INVALID_INPUT_INT)
                 if len(arr1) != len(arr2):
-                    print("Ошибка: массивы должны быть одинаковой длины!")
-                    arr1 = arr2 = None
-                else:
-                    result = None  # сброс результата
-                    print("Данные успешно введены.")
-                    logger.info("Данные введены вручную")
-            except ValueError as e:
-                print("Ошибка: введите только целые числа!")
-                logger.error(f"Ошибка ввода вручную: {e}")
+                    raise ArraysLengthMismatchError(Messages.TASK1_ARRAYS_LEN_MISMATCH)
+                result = None
+                print(Messages.DATA_ENTERED)
+                logger.info("Данные введены вручную")
+            except (InvalidInputError, ArraysLengthMismatchError) as e:
+                print(f"Ошибка в данных: {e}")
+                logger.error(f"Ошибка ввода: {e}")
                 arr1 = arr2 = None
+
 
         elif choice == "2":
             try:
-                n = int(input("Размер массивов (целое положительное число): "))
+                raw_n = input("Размер массивов (целое положительное число): ").strip()
+                if not raw_n:
+                    raise InvalidInputError("Размер не введён")
+                try:
+                    n = int(raw_n)
+                except ValueError:
+                    raise InvalidInputError(Messages.INVALID_INPUT_INT)
                 if n <= 0:
-                    print("Размер должен быть больше нуля!")
-                    continue
+                    raise InvalidInputError(Messages.INVALID_INPUT_SIZE)
                 arr1 = [random.randint(1, 20) for _ in range(n)]
                 arr2 = [random.randint(1, 20) for _ in range(n)]
                 result = None
-                print("Сгенерировано:")
+                print(Messages.GENERATED)
                 print("Массив 1:", arr1)
                 print("Массив 2:", arr2)
                 logger.info(f"Сгенерированы случайные массивы длины {n}")
-            except ValueError as e:
-                print("Ошибка: введите целое число!")
-                logger.error(f"Ошибка генерации: {e}")
+            except InvalidInputError as e:
+                print(f"Ошибка ввода: {e}")
+                logger.error(f"InvalidInputError при генерации: {e}")
 
         elif choice == "3":
             if arr1 is None or arr2 is None:
-                print("Ошибка: сначала введите данные!")
+                print(Messages.NO_DATA)
                 logger.info("Отказ: попытка выполнить алгоритм без данных")
             else:
                 try:
                     result = solve(arr1, arr2)
-                    print("Алгоритм выполнен.")
+                    print(Messages.ALGO_DONE)
                     logger.info("Алгоритм успешно выполнен")
-                except ValueError as e:
+                except ArraysLengthMismatchError as e:
                     print(f"Ошибка в данных: {e}")
-                    logger.error(f"ValueError в solve: {e}")
+                    logger.error(f"Ошибка в solve: {e}")
                     result = None
                 except Exception as e:
                     print(f"Неожиданная ошибка: {e}")
@@ -171,14 +190,15 @@ def menu():
 
         elif choice == "4":
             if result is None:
-                print("Ошибка: сначала выполните алгоритм!")
+                print(Messages.NOT_EXECUTED)
                 logger.info("Отказ: попытка вывода результата без выполнения")
             else:
-                print("Результат:", result)
+                print(Messages.TASK1_RESULT, result)
                 logger.info("Результат выведен")
 
         elif choice == "5":
-            logger.info("Пользователь вышел из меню задания 1")
+            logger.info(Messages.EXIT)
             break
         else:
-            print("Неверный выбор.")
+            print(Messages.INVALID_CHOICE)
+            logger.info("Неверный выбор в меню задания 1")

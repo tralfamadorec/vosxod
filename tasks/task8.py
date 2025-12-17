@@ -1,5 +1,6 @@
 import random
 import logging
+from errors import InvalidInputError, EmptyArrayError, NegativeNumberError, Messages
 
 # настройка логирования
 logger = logging.getLogger("task8")
@@ -30,12 +31,12 @@ def reverse_number(n):
         ValueError: если входное значение не является целым числом
     """
     if n < 0:
-        raise ValueError("Число должно быть неотрицательным для корректного переворота")
+        raise NegativeNumberError(Messages.TASK8_NEGATIVE_NUMBER)
     return int(str(n)[::-1])
 
 def count_common_with_reverse(arr1, arr2):
     if not arr1 or not arr2:
-        raise ValueError("Массивы не должны быть пустыми")
+        raise EmptyArrayError(Messages.TASK8_EMPTY_ARRAY)
     """
     считает количество элементов из первого массива, которые:
     - присутствуют во втором массиве, ИЛИ
@@ -92,43 +93,39 @@ def menu():
             try:
                 arr1 = list(map(int, input("Массив 1 (через пробел): ").split()))
                 arr2 = list(map(int, input("Массив 2 (через пробел): ").split()))
-                result = None  # сброс результата
+                result = None
                 logger.info("Данные введены вручную")
-            except ValueError as e:
-                print("Ошибка: введите только целые числа!")
-                logger.error(f"Ошибка ввода вручную в задании 8: {e}")
+            except ValueError:
+                raise InvalidInputError(Messages.INVALID_INPUT_INT)
+            except (InvalidInputError, EmptyArrayError, NegativeNumberError) as e:
+                print(f"Ошибка в данных: {e}")
+                logger.error(f"Ошибка в задании 8: {e}")
                 arr1 = arr2 = None
 
         elif choice == "2":
             try:
                 n = int(input("Размер массивов: "))
                 if n <= 0:
-                    print("Размер должен быть > 0")
-                    continue
-                arr1 = [random.randint(10, 999) for _ in range(n)]
-                arr2 = [random.randint(10, 999) for _ in range(n)]
-                result = None
-                print("Сгенерировано:")
-                print("Массив 1:", arr1)
-                print("Массив 2:", arr2)
-                logger.info(f"Сгенерированы случайные массивы длины {n}")
-            except ValueError as e:
-                print("Ошибка: введите целое число!")
-                logger.error(f"Ошибка генерации данных в задании 8: {e}")
+                    raise InvalidInputError(Messages.INVALID_INPUT_SIZE)
+                # ...
+            except ValueError:
+                raise InvalidInputError(Messages.INVALID_INPUT_INT)
+            except InvalidInputError as e:
+                print(f"Ошибка ввода: {e}")
+                logger.error(f"Ошибка генерации в задании 8: {e}")
 
         elif choice == "3":
             if arr1 is None or arr2 is None:
-                print("Ошибка: сначала введите данные!")
+                print(Messages.NO_DATA)
                 logger.info("Отказ: попытка выполнить алгоритм без данных")
             else:
                 try:
                     result = count_common_with_reverse(arr1, arr2)
-                    print("Алгоритм выполнен.")
+                    print(Messages.ALGO_DONE)
                     logger.info("Алгоритм успешно выполнен")
-                except ValueError as e:
+                except (EmptyArrayError, NegativeNumberError) as e:
                     print(f"Ошибка в данных: {e}")
-                    logger.error(f"ValueError в count_common_with_reverse: {e}")
-                    result = None
+                    logger.error(f"Ошибка в задании 8: {e}")
                 except Exception as e:
                     print(f"Неожиданная ошибка: {e}")
                     logger.error(f"Неожиданное исключение в задании 8: {e}")
@@ -136,13 +133,13 @@ def menu():
 
         elif choice == "4":
             if result is None:
-                print("Ошибка: выполните алгоритм перед выводом!")
+                print(Messages.NOT_EXECUTED)
                 logger.info("Отказ: попытка вывода результата без выполнения")
             else:
-                print(f"Общих чисел (с перевёрнутыми): {result}")
+                print(f"{Messages.TASK8_RESULT_PREFIX} {result}")
 
         elif choice == "5":
             logger.info("Пользователь вышел из меню задания 8")
             break
         else:
-            print("Неверный выбор.")
+            print(Messages.INVALID_CHOICE)

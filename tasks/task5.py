@@ -1,5 +1,6 @@
 import random
 import logging
+from errors import InvalidInputError, EmptyArrayError, Messages
 
 # настройка логгера
 logger = logging.getLogger("task5")
@@ -32,6 +33,8 @@ def count_subarrays_with_sum(arr, target):
         2  # подмассивы: [1,2] и [3]
     """
     logger.info(f"Вызов count_subarrays_with_sum с массивом {arr} и целью {target}")
+    if not arr:
+        raise EmptyArrayError(Messages.TASK5_EMPTY_ARRAY)
     count = 0
     n = len(arr)
     for i in range(n):
@@ -76,60 +79,58 @@ def menu():
             try:
                 arr = list(map(int, input("Массив (через пробел): ").split()))
                 target = int(input("Целевое число: "))
-                result = None  # сброс результата
-                print("Данные успешно введены.")
-                logger.info("Данные введены вручную")
-            except ValueError as e:
-                print("Ошибка: введите только целые числа!")
-                logger.error(f"Ошибка ввода вручную в задании 5: {e}")
+                if not arr:
+                    raise EmptyArrayError(Messages.TASK5_EMPTY_ARRAY)
+                result = None
+                print(Messages.DATA_ENTERED)
+            except ValueError:
+                raise InvalidInputError(Messages.INVALID_INPUT_INT)
+            except (InvalidInputError, EmptyArrayError) as e:
+                print(f"Ошибка в данных: {e}")
+                logger.error(f"Ошибка в задании 5: {e}")
                 arr = target = None
 
         elif choice == "2":
             try:
                 n = int(input("Размер массива (целое положительное число): "))
                 if n <= 0:
-                    print("Размер должен быть больше нуля!")
+                    print(Messages.INVALID_INPUT_SIZE)
                     continue
                 arr = [random.randint(-10, 10) for _ in range(n)]
                 target = random.randint(-5, 10)
                 result = None
-                print("Сгенерировано:")
+                print(Messages.GENERATED)
                 print("Массив:", arr)
                 print("Целевое число:", target)
                 logger.info(f"Сгенерированы случайные данные: массив длины {n}, цель = {target}")
             except ValueError as e:
-                print("Ошибка: введите корректное целое число!")
+                print(Messages.INVALID_INPUT_INT)
                 logger.error(f"Ошибка генерации данных в задании 5: {e}")
 
 
         elif choice == "3":
             if arr is None or target is None:
-                print("Ошибка: сначала введите данные!")
+                print(Messages.NO_DATA)
                 logger.info("Отказ: попытка выполнить алгоритм без данных")
             else:
                 try:
                     result = count_subarrays_with_sum(arr, target)
-                    print("Алгоритм выполнен.")
-                    logger.info("Алгоритм успешно выполнен")
-                except ValueError as e:
-                    print(f"Ошибка в данных: {e}")
-                    logger.error(f"ValueError в count_subarrays_with_sum: {e}")
-                    result = None
-                except Exception as e:
-                    print(f"Неожиданная ошибка: {e}")
-                    logger.error(f"Неожиданное исключение в задании 5: {e}")
+                    print(Messages.ALGO_DONE)
+                except EmptyArrayError as e:
+                    print(f"Ошибка: {e}")
+                    logger.error(f"EmptyArrayError: {e}")
                     result = None
 
         elif choice == "4":
             if result is None:
-                print("Ошибка: сначала выполните алгоритм!")
+                print(Messages.NOT_EXECUTED)
                 logger.info("Отказ: попытка вывода результата без выполнения")
             else:
-                print(f"Количество подмассивов с суммой {target}: {result}")
+                print(f"{Messages.TASK5_RESULT_PREFIX} {target}: {result}")
                 logger.info("Результат выведен")
 
         elif choice == "5":
-            break
             logger.info("Пользователь вышел из меню задания 5")
+            break
         else:
-            print("Неверный выбор.")
+            print(Messages.INVALID_CHOICE)
