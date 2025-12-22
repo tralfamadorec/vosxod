@@ -61,24 +61,75 @@ def count_common_with_reverse(arr1, arr2):
 
 
 def menu():
-    """
-    реализует текстовое меню для задания 8
-    пункты меню:
-    1. Ввод массивов вручную
-    2. Генерация случайных массивов
-    3. Выполнение алгоритма
-    4. Вывод результата
-    5. Возврат в главное меню
+    # меню задания 8, реализованное через конечный автомат (FSM) с использованием словаря
+    from errors import InvalidInputError, EmptyArrayError, NegativeNumberError, Messages
+    import random
 
-    соблюдаются все требования:
-    - нельзя выполнить без данных
-    - нельзя вывести без выполнения
-    - при новых данных результат сбрасывается
-    """
-    arr1 = None
-    arr2 = None
-    result = None  # результат не определён до выполнения
+    # контекст - данные, живущие между действиями
+    context = {
+        "arr1": None,
+        "arr2": None,
+        "result": None
+    }
 
+    # обработчики действий
+    def _input_manual():
+        try:
+            arr1 = list(map(int, input("Массив 1 (через пробел): ").split()))
+            arr2 = list(map(int, input("Массив 2 (через пробел): ").split()))
+            if not arr1 or not arr2:
+                raise EmptyArrayError(Messages.TASK8_EMPTY_ARRAY)
+            if any(x < 0 for x in arr1 + arr2):
+                raise NegativeNumberError(Messages.TASK8_NEGATIVE_NUMBER)
+            context["arr1"] = arr1
+            context["arr2"] = arr2
+            context["result"] = None
+            print(Messages.DATA_ENTERED)
+        except Exception as e:
+            print(f"Ошибка: {e}")
+
+    def _input_random():
+        try:
+            n = int(input("Размер массивов: "))
+            if n <= 0:
+                raise InvalidInputError(Messages.INVALID_INPUT_SIZE)
+            # Генерируем только положительные числа (для корректного переворота)
+            context["arr1"] = [random.randint(10, 999) for _ in range(n)]
+            context["arr2"] = [random.randint(10, 999) for _ in range(n)]
+            context["result"] = None
+            print(Messages.GENERATED)
+            print("Массив 1:", context["arr1"])
+            print("Массив 2:", context["arr2"])
+        except Exception as e:
+            print(f"Ошибка: {e}")
+
+    def _execute():
+        if context["arr1"] is None or context["arr2"] is None:
+            print(Messages.NO_DATA)
+        else:
+            try:
+                context["result"] = count_common_with_reverse(context["arr1"], context["arr2"])
+                print(Messages.ALGO_DONE)
+            except Exception as e:
+                print(f"Ошибка: {e}")
+
+    def _show_result():
+        if context["result"] is None:
+            print(Messages.NOT_EXECUTED)
+        else:
+            print(f"{Messages.TASK8_RESULT_PREFIX} {context['result']}")
+            input("\nНажмите Enter для возврата в меню...")
+
+    # словарь автомата
+    state_actions = {
+        "1": _input_manual,
+        "2": _input_random,
+        "3": _execute,
+        "4": _show_result,
+        "5": None  # выход
+    }
+
+    # основной цикл автомата
     while True:
         print("\n--- Задание 8 ---")
         print("1. Ввести массивы вручную")
@@ -87,59 +138,12 @@ def menu():
         print("4. Вывести результат")
         print("5. Назад в главное меню")
         choice = input("Выберите действие: ").strip()
-        logger.info(f"Пользователь выбрал пункт меню: {choice}")
 
-        if choice == "1":
-            try:
-                arr1 = list(map(int, input("Массив 1 (через пробел): ").split()))
-                arr2 = list(map(int, input("Массив 2 (через пробел): ").split()))
-                result = None
-                logger.info("Данные введены вручную")
-            except ValueError:
-                raise InvalidInputError(Messages.INVALID_INPUT_INT)
-            except (InvalidInputError, EmptyArrayError, NegativeNumberError) as e:
-                print(f"Ошибка в данных: {e}")
-                logger.error(f"Ошибка в задании 8: {e}")
-                arr1 = arr2 = None
-
-        elif choice == "2":
-            try:
-                n = int(input("Размер массивов: "))
-                if n <= 0:
-                    raise InvalidInputError(Messages.INVALID_INPUT_SIZE)
-                # ...
-            except ValueError:
-                raise InvalidInputError(Messages.INVALID_INPUT_INT)
-            except InvalidInputError as e:
-                print(f"Ошибка ввода: {e}")
-                logger.error(f"Ошибка генерации в задании 8: {e}")
-
-        elif choice == "3":
-            if arr1 is None or arr2 is None:
-                print(Messages.NO_DATA)
-                logger.info("Отказ: попытка выполнить алгоритм без данных")
-            else:
-                try:
-                    result = count_common_with_reverse(arr1, arr2)
-                    print(Messages.ALGO_DONE)
-                    logger.info("Алгоритм успешно выполнен")
-                except (EmptyArrayError, NegativeNumberError) as e:
-                    print(f"Ошибка в данных: {e}")
-                    logger.error(f"Ошибка в задании 8: {e}")
-                except Exception as e:
-                    print(f"Неожиданная ошибка: {e}")
-                    logger.error(f"Неожиданное исключение в задании 8: {e}")
-                    result = None
-
-        elif choice == "4":
-            if result is None:
-                print(Messages.NOT_EXECUTED)
-                logger.info("Отказ: попытка вывода результата без выполнения")
-            else:
-                print(f"{Messages.TASK8_RESULT_PREFIX} {result}")
-
-        elif choice == "5":
-            logger.info("Пользователь вышел из меню задания 8")
-            break
-        else:
+        if choice not in state_actions:
             print(Messages.INVALID_CHOICE)
+            continue
+
+        if choice == "5":
+            break
+
+        state_actions[choice]()

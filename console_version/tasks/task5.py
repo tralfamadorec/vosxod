@@ -48,23 +48,72 @@ def count_subarrays_with_sum(arr, target):
 
 
 def menu():
-    """
-    текстовое меню для задания 5
-    позволяет пользователю:
-    - ввести массив и целевое число вручную,
-    - сгенерировать случайные данные,
-    - выполнить алгоритм,
-    - вывести результат.
+    # меню задания 5, реализованное через конечный автомат (FSM) с использованием словаря
+    from errors import InvalidInputError, EmptyArrayError, Messages
+    import random
 
-    соблюдаются все требования:
-    - алгоритм недоступен без ввода данных,
-    - результат недоступен без выполнения,
-    - при вводе новых данных результат сбрасывается.
-    """
-    arr = None
-    target = None
-    result = None  # результат не определён до выполнения
+    # контекст - данные, живущие между действиями
+    context = {
+        "arr": None,
+        "target": None,
+        "result": None
+    }
 
+    # обработчики действий
+    def _input_manual():
+        try:
+            arr = list(map(int, input("Массив (через пробел): ").split()))
+            target = int(input("Целевое число: "))
+            if not arr:
+                raise EmptyArrayError(Messages.TASK5_EMPTY_ARRAY)
+            context["arr"] = arr
+            context["target"] = target
+            context["result"] = None
+            print(Messages.DATA_ENTERED)
+        except Exception as e:
+            print(f"Ошибка: {e}")
+
+    def _input_random():
+        try:
+            n = int(input("Размер массива: "))
+            if n <= 0:
+                raise InvalidInputError(Messages.INVALID_INPUT_SIZE)
+            context["arr"] = [random.randint(-10, 10) for _ in range(n)]
+            context["target"] = random.randint(-5, 10)
+            context["result"] = None
+            print(Messages.GENERATED)
+            print("Массив:", context["arr"])
+            print("Целевое число:", context["target"])
+        except Exception as e:
+            print(f"Ошибка: {e}")
+
+    def _execute():
+        if context["arr"] is None or context["target"] is None:
+            print(Messages.NO_DATA)
+        else:
+            try:
+                context["result"] = count_subarrays_with_sum(context["arr"], context["target"])
+                print(Messages.ALGO_DONE)
+            except Exception as e:
+                print(f"Ошибка: {e}")
+
+    def _show_result():
+        if context["result"] is None:
+            print(Messages.NOT_EXECUTED)
+        else:
+            print(f"{Messages.TASK5_RESULT_PREFIX} {context['target']}: {context['result']}")
+            input("\nНажмите Enter для возврата в меню...")
+
+    # словарь автомата
+    state_actions = {
+        "1": _input_manual,
+        "2": _input_random,
+        "3": _execute,
+        "4": _show_result,
+        "5": None  # выход
+    }
+
+    # основной цикл автомата
     while True:
         print("\n--- Задание 5 ---")
         print("1. Ввести массив и число вручную")
@@ -73,64 +122,12 @@ def menu():
         print("4. Вывести результат")
         print("5. Назад в главное меню")
         choice = input("Выберите действие: ").strip()
-        logger.info(f"Пользователь выбрал пункт меню: {choice}")
 
-        if choice == "1":
-            try:
-                arr = list(map(int, input("Массив (через пробел): ").split()))
-                target = int(input("Целевое число: "))
-                if not arr:
-                    raise EmptyArrayError(Messages.TASK5_EMPTY_ARRAY)
-                result = None
-                print(Messages.DATA_ENTERED)
-            except ValueError:
-                raise InvalidInputError(Messages.INVALID_INPUT_INT)
-            except (InvalidInputError, EmptyArrayError) as e:
-                print(f"Ошибка в данных: {e}")
-                logger.error(f"Ошибка в задании 5: {e}")
-                arr = target = None
-
-        elif choice == "2":
-            try:
-                n = int(input("Размер массива (целое положительное число): "))
-                if n <= 0:
-                    print(Messages.INVALID_INPUT_SIZE)
-                    continue
-                arr = [random.randint(-10, 10) for _ in range(n)]
-                target = random.randint(-5, 10)
-                result = None
-                print(Messages.GENERATED)
-                print("Массив:", arr)
-                print("Целевое число:", target)
-                logger.info(f"Сгенерированы случайные данные: массив длины {n}, цель = {target}")
-            except ValueError as e:
-                print(Messages.INVALID_INPUT_INT)
-                logger.error(f"Ошибка генерации данных в задании 5: {e}")
-
-
-        elif choice == "3":
-            if arr is None or target is None:
-                print(Messages.NO_DATA)
-                logger.info("Отказ: попытка выполнить алгоритм без данных")
-            else:
-                try:
-                    result = count_subarrays_with_sum(arr, target)
-                    print(Messages.ALGO_DONE)
-                except EmptyArrayError as e:
-                    print(f"Ошибка: {e}")
-                    logger.error(f"EmptyArrayError: {e}")
-                    result = None
-
-        elif choice == "4":
-            if result is None:
-                print(Messages.NOT_EXECUTED)
-                logger.info("Отказ: попытка вывода результата без выполнения")
-            else:
-                print(f"{Messages.TASK5_RESULT_PREFIX} {target}: {result}")
-                logger.info("Результат выведен")
-
-        elif choice == "5":
-            logger.info("Пользователь вышел из меню задания 5")
-            break
-        else:
+        if choice not in state_actions:
             print(Messages.INVALID_CHOICE)
+            continue
+
+        if choice == "5":
+            break
+
+        state_actions[choice]()

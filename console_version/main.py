@@ -33,18 +33,19 @@ if not logger.handlers:
 
 
 def main():
-    """
-    основная функция, реализующая главное меню программы
-    пункты меню:
-        1. Задание 1
-        2. Задание 5
-        3. Задание 8
-        4. Выход
+    # главное меню программы как конечный автомат
+    from errors import Messages
 
-    выбор задания передаёт управление соответствующей функции menu() из модуля задачи
-    после завершения подменю управление возвращается в главное меню
-    """
+    # словарь переходов:
+    menu_actions = {
+        "1": lambda: task1.menu(),
+        "2": lambda: task5.menu(),
+        "3": lambda: task8.menu(),
+        "4": None  # выход
+    }
+
     logger.info("Запуск главного меню программы")
+
     while True:
         print("\n=== Главное меню ===")
         print("1. Задание 1")
@@ -54,22 +55,19 @@ def main():
         choice = input("Выберите задание: ").strip()
         logger.info(f"Пользователь выбрал в главном меню: {choice}")
 
-        if choice == "1":
-            task1.menu()
-            logger.info("Возврат из меню задания 1 в главное меню")
-        elif choice == "2":
-            task5.menu()
-            logger.info("Возврат из меню задания 5 в главное меню")
-        elif choice == "3":
-            task8.menu()
-            logger.info("Возврат из меню задания 8 в главное меню")
-        elif choice == "4":
+        if choice not in menu_actions:
+            print(Messages.INVALID_CHOICE)
+            logger.info("Неверный выбор в главном меню")
+            continue
+
+        if choice == "4":
             print("Программа завершена.")
             logger.info("Программа завершена пользователем")
             break
-        else:
-            print("Неверный выбор.")
-            logger.info("Неверный выбор в главном меню")
+
+        # выполняем выбранное задание
+        menu_actions[choice]()
+        # после возврата - остаёмся в главном меню (петля автомата)
 
 
 if __name__ == "__main__":
