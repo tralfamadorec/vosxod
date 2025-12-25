@@ -1,6 +1,5 @@
-import random
 import logging
-from errors import InvalidInputError, EmptyArrayError, NegativeNumberError, Messages
+from errors import EmptyArrayError, NegativeNumberError, Messages
 
 # настройка логирования
 logger = logging.getLogger("task8")
@@ -85,8 +84,8 @@ def menu():
             context["arr2"] = arr2
             context["result"] = None
             print(Messages.DATA_ENTERED)
-        except Exception as e:
-            print(f"Ошибка: {e}")
+        except Exception as err:
+            print(f"Ошибка: {err}")
 
     def _input_random():
         try:
@@ -100,8 +99,8 @@ def menu():
             print(Messages.GENERATED)
             print("Массив 1:", context["arr1"])
             print("Массив 2:", context["arr2"])
-        except Exception as e:
-            print(f"Ошибка: {e}")
+        except Exception as err:
+            print(f"Ошибка: {err}")
 
     def _execute():
         if context["arr1"] is None or context["arr2"] is None:
@@ -110,8 +109,8 @@ def menu():
             try:
                 context["result"] = count_common_with_reverse(context["arr1"], context["arr2"])
                 print(Messages.ALGO_DONE)
-            except Exception as e:
-                print(f"Ошибка: {e}")
+            except Exception as err:
+                print(f"Ошибка: {err}")
 
     def _show_result():
         if context["result"] is None:

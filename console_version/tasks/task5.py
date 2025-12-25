@@ -1,6 +1,5 @@
-import random
 import logging
-from errors import InvalidInputError, EmptyArrayError, Messages
+from errors import EmptyArrayError, Messages
 
 # настройка логгера
 logger = logging.getLogger("task5")
@@ -70,8 +69,8 @@ def menu():
             context["target"] = target
             context["result"] = None
             print(Messages.DATA_ENTERED)
-        except Exception as e:
-            print(f"Ошибка: {e}")
+        except Exception as err:
+            print(f"Ошибка: {err}")
 
     def _input_random():
         try:
@@ -84,8 +83,8 @@ def menu():
             print(Messages.GENERATED)
             print("Массив:", context["arr"])
             print("Целевое число:", context["target"])
-        except Exception as e:
-            print(f"Ошибка: {e}")
+        except Exception as err:
+            print(f"Ошибка: {err}")
 
     def _execute():
         if context["arr"] is None or context["target"] is None:
@@ -94,8 +93,8 @@ def menu():
             try:
                 context["result"] = count_subarrays_with_sum(context["arr"], context["target"])
                 print(Messages.ALGO_DONE)
-            except Exception as e:
-                print(f"Ошибка: {e}")
+            except Exception as err:
+                print(f"Ошибка: {err}")
 
     def _show_result():
         if context["result"] is None:
