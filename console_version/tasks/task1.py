@@ -173,3 +173,26 @@ def menu():
             break
 
         state_actions[choice]()
+
+
+if name == "main":
+    print("Тестирование задания 1 (solve):")
+    print("-" * 60)
+
+    # успешный
+    try:
+        res = solve([5, 7, 4], [4, 9, 3])
+        print("Успешно: [5,7,4] + [4,9,3] ->", res)
+    except Exception as e:
+        print("Ошибка:", e)
+
+    # разная длина массивов
+    try:
+        solve([1, 2], [1, 2, 3])
+        print("Ошибка не возникла (должна была)")
+    except ArraysLengthMismatchError as e:
+        print("Поймана ожидаемая ошибка:", e)
+    except Exception as e:
+        print("Неожиданная ошибка:", e)
+
+    print("\nТест завершён.")

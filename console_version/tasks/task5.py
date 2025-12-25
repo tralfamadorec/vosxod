@@ -15,7 +15,7 @@ if not logger.handlers:
 
 def count_subarrays_with_sum(arr, target):
     if not arr:
-        raise ValueError("Массив не должен быть пустым")
+        raise EmptyArrayError("Массив не должен быть пустым")
     """
     подсчитывает количество непрерывных подмассивов, сумма элементов которых равна заданному числу.
     подмассив - это последовательный фрагмент исходного массива.
@@ -131,3 +131,24 @@ def menu():
             break
 
         state_actions[choice]()
+
+
+if __name__ == "main":
+    print("Тестирование задания 5 (count_subarrays_with_sum):")
+    print("-" * 60)
+
+    # успешный
+    try:
+        res = count_subarrays_with_sum([1, 1, 1], 2)
+        print("[1,1,1], сумма = 2 ->", res)  # ожидается: 2
+    except Exception as e:
+        print("Ошибка:", e)
+
+    # пустой массив
+    try:
+        count_subarrays_with_sum([], 5)
+        print("Ошибка не возникла")
+    except EmptyArrayError as e:
+        print("Поймана ожидаемая ошибка:", e)
+
+    print("\nТест завершён.")

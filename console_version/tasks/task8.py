@@ -147,3 +147,31 @@ def menu():
             break
 
         state_actions[choice]()
+
+
+if __name__ == "__main__":
+    print("Тестирование задания 8 (count_common_with_reverse):")
+    print("-" * 60)
+
+    # успешный
+    try:
+        res = count_common_with_reverse([12, 34, 56], [21, 78, 65])
+        print("[12,34,56] и [21,78,65] ->", res)
+    except Exception as e:
+        print("Ошибка:", e)
+
+    # отрицательное число
+    try:
+        count_common_with_reverse([-5], [5])
+        print("Ошибка не возникла")
+    except NegativeNumberError as e:
+        print("Поймана ожидаемая ошибка:", e)
+
+    # пустой массив
+    try:
+        count_common_with_reverse([], [1])
+        print("Ошибка не возникла")
+    except EmptyArrayError as e:
+        print("Поймана ожидаемая ошибка:", e)
+
+    print("\nТест завершён.")
