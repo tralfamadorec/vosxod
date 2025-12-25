@@ -4,6 +4,7 @@ import time
 import random
 import logging
 from datetime import datetime
+import threading
 
 # импортируем чистые функции из tasks
 from tasks.task1 import solve as task1_solve
@@ -77,7 +78,13 @@ def main():
         while True:
             client_socket, addr = server.accept()
             print(f"Подключился клиент {client_id} ({addr})")
-            handle_client(client_socket, client_id)
+            # запускаем обработку в отдельном потоке
+            client_thread = threading.Thread(
+                target=handle_client,
+                args=(client_socket, client_id)
+            )
+            client_thread.daemon = True
+            client_thread.start()
             client_id += 1
     except KeyboardInterrupt:
         print("\nСервер остановлен")
